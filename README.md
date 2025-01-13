@@ -31,3 +31,11 @@ Créer un module séparé pour les connexions aux bases de données permet de ce
 #### Comment gérer proprement la fermeture des connexions ?
 La fermeture propre des connexions implique d'écouter les événements tels que `SIGINT` (arrêt du processus) ou `SIGTERM` (arrêt du service) pour exécuter des fonctions de nettoyage. Cela peut être réalisé en appelant les méthodes appropriées des clients, comme `mongoClient.close()` pour MongoDB et `redisClient.quit()` pour Redis, afin de libérer les ressources et éviter les fuites de mémoire ou les connexions inutilisées.
 
+
+### b. Fichier `env.js`
+
+#### Pourquoi est-il important de valider les variables d'environnement au démarrage ? 
+Cela permet de s'assurer que toutes les variables essentielles au bon fonctionnement de l'application sont correctement définies. Sans validation, des erreurs inattendues pourraient survenir plus tard dans l'exécution, rendant le débogage plus difficile.
+
+#### Que se passe-t-il si une variable requise est manquante ?  
+Si une variable requise est manquante, l'application risque de ne pas fonctionner correctement ou de planter. En validant les variables dès le démarrage, on peut détecter ce problème immédiatement et afficher un message d'erreur clair pour corriger la configuration avant le lancement.
