@@ -2,7 +2,7 @@
 
 ## I. Réponses aux questions des commentaires
 
-### 1. Fichier environnement `env`
+### 1. Fichier environnement `.env`
 
 #### Quelles sont les informations sensibles à ne jamais committer ?
 Les informations sensibles à ne jamais committer incluent :
@@ -20,8 +20,13 @@ Les variables d'environnement permettent :
 - De suivre les bonnes pratiques de sécurité en minimisant les risques de compromission.
 
 ---
+### 2. Fichier `.gitignore`
 
-### 2. Couche config  
+Le fichier `.gitignore` doit être complété avec des exclusions spécifiques au projet afin d'éviter de versionner des fichiers inutiles ou sensibles.
+
+---
+
+### 3. Couche config  
 
 ### a. Fichier `db.js`
 
@@ -42,7 +47,7 @@ Si une variable requise est manquante, l'application risque de ne pas fonctionne
 
 ---
 
-### 3. Couche controllers - fichier `courseController.js`
+### 4. Couche controllers - fichier `courseController.js`
 
 **Quelle est la différence entre un contrôleur et une route ?**  
 Un contrôleur est responsable de gérer la logique métier, comme le traitement des données ou les appels aux services. Une route, quant à elle, définit les points d'entrée (endpoints) de l'API et transfère les requêtes au contrôleur approprié.
@@ -52,7 +57,7 @@ Séparer la logique métier des routes permet de rendre le code plus modulaire, 
 
 ---
 
-### 4. Couche routes - fichier `courseRoutes.js`
+### 5. Couche routes - fichier `courseRoutes.js`
 
 **Pourquoi séparer les routes dans différents fichiers ?**  
 Séparer les routes dans différents fichiers permet de structurer le code de manière plus claire et organisée. Cela rend le projet plus facile à maintenir et à étendre, en regroupant les routes liées à une même ressource ou fonctionnalité dans un seul fichier.
@@ -62,7 +67,7 @@ Les routes peuvent être organisées en regroupant les endpoints par ressource o
 
 ---
 
-### 5. Couche services
+### 6. Couche services
 
 ### a. Fichier `mongoService.js`
 
@@ -80,3 +85,20 @@ Les bonnes pratiques pour les clés Redis incluent :
 - Limiter la longueur des clés pour des performances optimales,  
 - Préfixer les clés avec un identifiant unique si plusieurs applications partagent la même instance Redis,  
 - Éviter d'utiliser des caractères spéciaux ou des espaces dans les clés.
+
+---
+
+### 7. Fichier `app.js`
+
+**Comment organiser le point d'entrée de l'application ?**  
+Le point d'entrée de l'application doit être organisé de manière à initialiser les différentes parties de l'application de façon claire et modulaire. Cela inclut :  
+- La configuration des variables d'environnement,  
+- L'import des modules essentiels comme les routes et les middlewares,  
+- L'initialisation des connexions aux bases de données,  
+- La configuration des gestionnaires d'erreurs globales et des signaux système (par exemple, `SIGTERM`).
+
+**Quelle est la meilleure façon de gérer le démarrage de l'application ?**  
+La meilleure façon de gérer le démarrage est de suivre une approche asynchrone pour gérer les connexions aux bases de données et d'autres services externes. Cela inclut :  
+- Utiliser des blocs `try-catch` pour capturer et gérer les erreurs lors du démarrage,  
+- S'assurer que toutes les dépendances critiques (comme les connexions aux bases de données) sont opérationnelles avant de lancer le serveur,  
+- Ajouter une gestion propre des erreurs et des interruptions (comme `SIGTERM`) pour fermer les connexions et libérer les ressources proprement.
