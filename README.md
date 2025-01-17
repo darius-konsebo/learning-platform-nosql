@@ -1,5 +1,7 @@
 # Projet de fin de module NoSQL
 
+---
+
 ## Introduction
 
 Ce projet est une application backend pour une plateforme d'apprentissage en ligne, développée avec Node.js, MongoDB, et Redis. L'objectif principal est de fournir une architecture modulaire, maintenable et performante, permettant de gérer les cours, les étudiants, et les statistiques associées. L'application suit une organisation en couches, incluant des fichiers de configuration, des services, des contrôleurs, et des routes, afin de respecter les principes de séparation des responsabilités et de réutilisabilité du code.
@@ -7,6 +9,8 @@ Ce projet est une application backend pour une plateforme d'apprentissage en lig
 En utilisant des bases de données comme MongoDB pour le stockage persistant et Redis pour le cache, ce projet met en œuvre des pratiques modernes pour assurer des performances optimales et une gestion efficace des données. L'infrastructure est conçue pour être évolutive, avec une validation stricte des variables d'environnement et une gestion robuste des connexions aux bases de données.
 
 Ce projet s'inscrit dans une démarche d'apprentissage et de développement de compétences en architecture logicielle et en bonnes pratiques backend, tout en offrant une base solide pour la création d'une plateforme fonctionnelle.
+
+---
 
 ## I. Réponses aux questions des commentaires
 
@@ -27,12 +31,11 @@ Les variables d'environnement permettent :
 - De faciliter le déploiement en permettant de personnaliser une application sans modifier le code source.
 - De suivre les bonnes pratiques de sécurité en minimisant les risques de compromission.
 
----
+
 ### 2. Fichier `.gitignore`
 
 Le fichier `.gitignore` doit être complété avec des exclusions spécifiques au projet afin d'éviter de versionner des fichiers inutiles ou sensibles.
 
----
 
 ### 3. Couche config  
 
@@ -53,7 +56,6 @@ Cela permet de s'assurer que toutes les variables essentielles au bon fonctionne
 #### Que se passe-t-il si une variable requise est manquante ?  
 Si une variable requise est manquante, l'application risque de ne pas fonctionner correctement ou de planter. En validant les variables dès le démarrage, on peut détecter ce problème immédiatement et afficher un message d'erreur clair pour corriger la configuration avant le lancement.
 
----
 
 ### 4. Couche controllers - fichier `courseController.js`
 
@@ -63,7 +65,6 @@ Un contrôleur est responsable de gérer la logique métier, comme le traitement
 **Pourquoi séparer la logique métier des routes ?**  
 Séparer la logique métier des routes permet de rendre le code plus modulaire, réutilisable et maintenable. Cela facilite également les tests unitaires en isolant les différentes responsabilités.
 
----
 
 ### 5. Couche routes - fichier `courseRoutes.js`
 
@@ -73,7 +74,6 @@ Séparer les routes dans différents fichiers permet de structurer le code de ma
 **Comment organiser les routes de manière cohérente ?**  
 Les routes peuvent être organisées en regroupant les endpoints par ressource ou fonctionnalité. Par exemple, créer des fichiers dédiés pour chaque entité principale, suivre des conventions de nommage claires, et utiliser une structure RESTful pour les endpoints.
 
----
 
 ### 6. Couche services
 
@@ -94,7 +94,6 @@ Les bonnes pratiques pour les clés Redis incluent :
 - Préfixer les clés avec un identifiant unique si plusieurs applications partagent la même instance Redis,  
 - Éviter d'utiliser des caractères spéciaux ou des espaces dans les clés.
 
----
 
 ### 7. Fichier `app.js`
 
@@ -110,6 +109,22 @@ La meilleure façon de gérer le démarrage est de suivre une approche asynchron
 - Utiliser des blocs `try-catch` pour capturer et gérer les erreurs lors du démarrage,  
 - S'assurer que toutes les dépendances critiques (comme les connexions aux bases de données) sont opérationnelles avant de lancer le serveur,  
 - Ajouter une gestion propre des erreurs et des interruptions (comme `SIGTERM`) pour fermer les connexions et libérer les ressources proprement.
+
+---
+
+## II. Implémentation des TODO
+
+---
+
+## III. Tests des fonctionnalités
+
+### 1. Lancement de l'application
+
+Installer les dépendances, s'assurer que qu'on les prérequis node.js redis et mongodb, actvier le serveur redis et après lancer `npm start`
+
+![Image1](Captures_d'écran/Connexion_établie.png)
+
+---
 
 ## Conclusion
 
