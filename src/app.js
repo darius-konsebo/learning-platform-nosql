@@ -2,53 +2,59 @@
 const express = require('express');
 const config = require('./config/env');
 const db = require('./config/db');
+const cors = require('cors');  // Middleware CORS
 
+// Importer les routes
 const courseRoutes = require('./routes/courseRoutes');
 const studentRoutes = require('./routes/studentRoutes');
 
 const app = express();
 
-async function startServer() {
+// Connexion aux bases de données
+async function connectDatabases() {
   try {
-    // Initialiser les connexions aux bases de données
-    console.log('Connecting to databases...');
-    await db.connectMongo();
-    await db.connectRedis();
-    console.log('Databases connected successfully.');
-
-    // Configurer les middlewares Express
-    console.log('Configuring middlewares...');
-    app.use(express.json());
-    app.use(express.urlencoded({ extended: true }));
-
-    // Monter les routes
-    console.log('Mounting routes...');
-    app.use('/api/courses', courseRoutes);
-    app.use('/api/students', studentRoutes);
-
-    // Démarrer le serveur
-    const port = config.port;
-    app.listen(port, () => {
-      console.log(`Server is running on port ${port}`);
-    });
+    await db.connectMongo();  // Connexion MongoDB
+    await db.connectRedis();  // Connexion Redis
+    console.log('Successfully connected to MongoDB and Redis');  
   } catch (error) {
-    console.error('Failed to start server:', error);
-    process.exit(1); // Arrêt du processus en cas d'échec critique
+    console.error('Failed to connect to databases:', error);
+    process.exit(1);  // Arrêter l'application si la connexion échoue
   }
 }
 
-// Gestion propre de l'arrêt
-process.on('SIGTERM', async () => {
+// Fonction pour démarrer le serveur
+async function startServer() {
   try {
-    console.log('SIGTERM received. Closing connections...');
-    await db.closeMongo();
-    await db.closeRedis();
-    console.log('Connections closed. Exiting process.');
-    process.exit(0);
+    // Initialiser les connexions aux bases de données
+    await connectDatabases();
+
+    // Configurer les middlewares
+    app.use(express.json());  // Middleware express.json() pour parser les requêtes en JSON
+    app.use(express.urlencoded({ extended: true }));  // Middleware pour analyser les formulaires URL-encodés
+
+    // Monter les routes
+    app.use('/courses', courseRoutes);  // Définir les routes pour les cours
+    app.use('/students', studentRoutes); // Routes pour les étudiants
+
+    // Démarrer le serveur
+    app.listen(config.port, () => {
+      console.log(`Server running on port ${config.port}`);
+    });
   } catch (error) {
-    console.error('Error during shutdown:', error);
+    console.error('Failed to start server:', error);
     process.exit(1);
   }
+}
+
+// Gérer la fermeture du serveur
+process.on('SIGTERM', async () => {
+  console.log('Shutting down server...');
+  await db.closeConnections();  // Fermer les connexions aux bases de données
+  process.exit(0);  // Terminer le processus
 });
 
+// Lancer le serveur
 startServer();
+
+// Exporter l'application pour les tests
+module.exports = app;  // Cette ligne permet de rendre `app` disponible pour les tests

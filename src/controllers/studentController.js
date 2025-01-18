@@ -2,123 +2,155 @@ const { ObjectId } = require('mongodb');
 const mongoService = require('../services/mongoService');
 const redisService = require('../services/redisService');
 
-// Créer un étudiant
+// Fonction pour calculer l'âge à partir de la date de naissance
+function calculateAge(birthdate) {
+  const birth = new Date(birthdate);
+  const today = new Date();
+  let age = today.getFullYear() - birth.getFullYear();
+  const monthDiff = today.getMonth() - birth.getMonth();
+
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+    age--;
+  }
+
+  return age;
+}
+
+// Fonction pour créer un étudiant
 async function createStudent(req, res) {
+  const { name, email, birthdate } = req.body;
+
+  // Vérification des champs requis
+  if (!name || !email || !birthdate) {
+    return res.status(400).json({ error: 'Tous les champs sont requis : name, email, et birthdate' });
+  }
+
   try {
-    const studentData = req.body;
+    // Créer l'étudiant dans MongoDB
+    const student = await mongoService.insertOne('students', { name, email, birthdate });
 
-    if (!studentData || !studentData.name || !studentData.email) {
-      return res.status(400).json({ error: 'Les champs "name" et "email" sont obligatoires.' });
-    }
+    // Stocker les informations de l'étudiant dans Redis pour la mise en cache
+    await redisService.cacheData(`student:${student._id}`, student, 3600);
 
-    const insertedStudent = await mongoService.insertOne('students', studentData);
-    await redisService.cacheData(`student:${insertedStudent._id}`, insertedStudent, 3600);
-
-    return res.status(201).json({ message: 'Étudiant créé avec succès.', student: insertedStudent });
+    return res.status(201).json(student);
   } catch (error) {
     console.error('Erreur lors de la création de l\'étudiant :', error);
-    return res.status(500).json({ error: 'Erreur interne du serveur.' });
+    return res.status(500).json({ error: 'Erreur interne du serveur' });
   }
 }
 
-// Récupérer un étudiant par ID
-async function getStudent(req, res) {
+// Fonction pour lire tous les étudiants
+async function getAllStudents(req, res) {
   try {
-    const studentId = req.params.id;
+    const students = await mongoService.getAll('students');
+    const studentsWithAge = students.map(student => ({
+      ...student,
+      age: calculateAge(student.birthdate),
+    }));
 
-    if (!ObjectId.isValid(studentId)) {
-      return res.status(400).json({ error: 'ID d\'étudiant invalide.' });
-    }
+    return res.status(200).json(studentsWithAge);
+  } catch (error) {
+    console.error('Erreur lors de la récupération des étudiants :', error);
+    return res.status(500).json({ error: 'Erreur interne du serveur' });
+  }
+}
 
+// Fonction pour lire un étudiant par ID
+async function getStudentById(req, res) {
+  const { id } = req.params;
+
+  try {
     // Vérifier dans le cache Redis
-    const cachedStudent = await redisService.getData(`student:${studentId}`);
+    const cachedStudent = await redisService.getCachedData(`student:${id}`);
     if (cachedStudent) {
-      return res.status(200).json({ student: cachedStudent, source: 'cache' });
+      const student = JSON.parse(cachedStudent);
+      student.age = calculateAge(student.birthdate);
+      return res.status(200).json(student);
     }
 
-    // Sinon, chercher dans MongoDB
-    const student = await mongoService.findOneById('students', studentId);
+    // Si non trouvé dans Redis, vérifier MongoDB
+    const student = await mongoService.findOneById('students', id);
     if (!student) {
-      return res.status(404).json({ error: 'Étudiant non trouvé.' });
+      return res.status(404).json({ error: 'Étudiant non trouvé' });
     }
 
-    // Mettre en cache pour des requêtes futures
-    await redisService.cacheData(`student:${studentId}`, student, 3600);
+    student.age = calculateAge(student.birthdate);
 
-    return res.status(200).json({ student });
+    // Mettre en cache l'étudiant récupéré
+    await redisService.cacheData(`student:${id}`, student, 3600);
+
+    return res.status(200).json(student);
   } catch (error) {
     console.error('Erreur lors de la récupération de l\'étudiant :', error);
-    return res.status(500).json({ error: 'Erreur interne du serveur.' });
+    return res.status(500).json({ error: 'Erreur interne du serveur' });
   }
 }
 
-// Mettre à jour un étudiant par ID
+// Fonction pour mettre à jour un étudiant
 async function updateStudent(req, res) {
+  const { id } = req.params;
+  const { name, email, birthdate } = req.body;
+
+  // Vérification des champs requis
+  if (!name || !email || !birthdate) {
+    return res.status(400).json({ error: 'Tous les champs sont requis : name, email, et birthdate' });
+  }
+
   try {
-    const studentId = req.params.id;
-    const updates = req.body;
-
-    if (!ObjectId.isValid(studentId)) {
-      return res.status(400).json({ error: 'ID d\'étudiant invalide.' });
+    const updatedStudent = await mongoService.updateOneById('students', id, { name, email, birthdate });
+    if (!updatedStudent) {
+      return res.status(404).json({ error: 'Étudiant non trouvé' });
     }
 
-    const updatedStudent = await mongoService.updateOne('students', { _id: new ObjectId(studentId) }, { $set: updates });
-    if (!updatedStudent.matchedCount) {
-      return res.status(404).json({ error: 'Étudiant non trouvé.' });
-    }
+    // Mettre à jour le cache Redis
+    await redisService.cacheData(`student:${id}`, updatedStudent, 3600);
 
-    // Invalider le cache Redis
-    await redisService.deleteData(`student:${studentId}`);
-
-    return res.status(200).json({ message: 'Étudiant mis à jour avec succès.' });
+    return res.status(200).json(updatedStudent);
   } catch (error) {
     console.error('Erreur lors de la mise à jour de l\'étudiant :', error);
-    return res.status(500).json({ error: 'Erreur interne du serveur.' });
+    return res.status(500).json({ error: 'Erreur interne du serveur' });
   }
 }
 
-// Supprimer un étudiant par ID
+// Fonction pour supprimer un étudiant
 async function deleteStudent(req, res) {
+  const { id } = req.params;
+
   try {
-    const studentId = req.params.id;
-
-    if (!ObjectId.isValid(studentId)) {
-      return res.status(400).json({ error: 'ID d\'étudiant invalide.' });
+    const result = await mongoService.deleteOneById('students', id);
+    if (!result) {
+      return res.status(404).json({ error: 'Étudiant non trouvé' });
     }
 
-    const deletedStudent = await mongoService.deleteOne('students', { _id: new ObjectId(studentId) });
-    if (!deletedStudent.deletedCount) {
-      return res.status(404).json({ error: 'Étudiant non trouvé.' });
-    }
+    // Supprimer le cache Redis associé
+    await redisService.deleteCache(`student:${id}`);
 
-    // Supprimer du cache Redis
-    await redisService.deleteData(`student:${studentId}`);
-
-    return res.status(200).json({ message: 'Étudiant supprimé avec succès.' });
+    return res.status(200).json({ message: 'Étudiant supprimé avec succès' });
   } catch (error) {
     console.error('Erreur lors de la suppression de l\'étudiant :', error);
-    return res.status(500).json({ error: 'Erreur interne du serveur.' });
+    return res.status(500).json({ error: 'Erreur interne du serveur' });
   }
 }
 
-// Obtenir les statistiques des étudiants
+// Fonction pour obtenir les statistiques des étudiants
 async function getStudentStats(req, res) {
   try {
-    const stats = await mongoService.aggregate('students', [
-      { $group: { _id: null, totalStudents: { $sum: 1 } } }
-    ]);
+    const totalStudents = await mongoService.getTotalCount('students');
 
-    return res.status(200).json({ stats });
+    return res.status(200).json({
+      totalStudents,
+    });
   } catch (error) {
-    console.error('Erreur lors de la récupération des statistiques :', error);
-    return res.status(500).json({ error: 'Erreur interne du serveur.' });
+    console.error('Erreur lors de la récupération des statistiques des étudiants :', error);
+    return res.status(500).json({ error: 'Erreur interne du serveur' });
   }
 }
 
-// Export des contrôleurs
+// Export des fonctions du contrôleur
 module.exports = {
   createStudent,
-  getStudent,
+  getAllStudents,
+  getStudentById,
   updateStudent,
   deleteStudent,
   getStudentStats,
