@@ -216,15 +216,27 @@ Le fichier `courseController.test.js` a ensuite été créé et testé avec succ
 
 ![Image3](Captures_d'écran/Jest_all.png)
 
-Grâce à Jest, il est possible de tester efficacement les opérations CRUD en isolant les différents composants de l'application grâce aux mocks et en s'assurant que chaque fonctionnalité fonctionne comme prévu. Les tests permettent non seulement de valider les opérations mais aussi de prévenir d'éventuelles régressions lors de l'ajout de nouvelles fonctionnalités ou de modifications du code.
 ---
 
 ## Conclusion
 
-Ce projet de plateforme d'apprentissage en ligne démontre la mise en œuvre réussie d'une architecture modulaire, scalable et maintenable en utilisant Node.js, MongoDB, et Redis. L'approche adoptée met en avant des pratiques modernes de développement logiciel, telles que la séparation des responsabilités, la centralisation de la logique métier, et l'utilisation d'un cache pour optimiser les performances.
+Ce projet de plateforme d'apprentissage en ligne illustre l'implémentation réussie d'une architecture modulaire et performante basée sur Node.js, MongoDB, et Redis. L'approche adoptée privilégie la séparation des responsabilités, l'optimisation des performances via un cache, et une organisation claire des couches applicatives.
 
-Grâce à cette structure bien définie, le projet offre une base solide pour ajouter de nouvelles fonctionnalités, améliorer les performances ou intégrer d'autres services externes. Les contrôles rigoureux des variables d'environnement, la gestion centralisée des connexions aux bases de données, et l'organisation claire des différentes couches contribuent à la robustesse et à la sécurité de l'application.
+L'utilisation de Jest pour les tests unitaires et d'intégration garantit une validation rapide et fiable des fonctionnalités. Sa simplicité, sa compatibilité avec Node.js, et ses outils avancés, tels que les mocks, en font un choix idéal pour assurer la robustesse et la maintenabilité du projet.
 
-Ce projet constitue non seulement une solution fonctionnelle, mais aussi une opportunité d'apprentissage approfondi des principes fondamentaux de conception logicielle et de bonnes pratiques en matière de développement backend. Les prochaines étapes pourraient inclure l’ajout de nouvelles fonctionnalités, comme la gestion des utilisateurs, l’intégration d’analyses avancées, ou encore la mise en production sur un serveur cloud.
+Ce projet offre une base solide pour intégrer de nouvelles fonctionnalités, améliorer les performances, ou préparer la mise en production sur le cloud, tout en appliquant des principes modernes de développement backend.
 
-Ce travail est une preuve concrète de la capacité à concevoir et développer une application professionnelle, répondant aux besoins techniques et aux défis pratiques du développement logiciel moderne.
+---
+
+## À propos de l'auteur
+
+Ce projet a été développé par KONSEBO Wendbénédo Albéric Darius, élève ingénieur en Informatique à l'Ecole Normale Supérieure de l'Enseignement Technique (ENSET) de Mohammedia
+
+### Coordonnées
+- **Nom :** KONSEBO Wendbénédo Albéric Darius
+- **Email :** [dariuskonsebo@gmail.com]
+- **LinkedIn :** [link](https://www.linkedin.com/in/wendb%C3%A9n%C3%A9do-alb%C3%A9ric-darius-konsebo-aa5439258/)
+- **GitHub :** [git](https://github.com/darius-konsebo)
+
+N'hésitez pas à me contacter pour toute question ou suggestion liée à ce projet.
+
