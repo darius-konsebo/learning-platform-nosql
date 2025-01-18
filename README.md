@@ -114,16 +114,109 @@ La meilleure façon de gérer le démarrage est de suivre une approche asynchron
 
 ## II. Implémentation des TODO
 
+Les fonctions des différentes couches telles que `config`, `controllers`, `routes`, `services` et le fichier `app.js` afin de configurer l'environnement, gérer les services (`MongoDB` et `Redis`) et d'assurer les opération CRUD pour les étudiants et les cours.
+
 ---
 
 ## III. Tests des fonctionnalités
 
 ### 1. Lancement de l'application
 
-Installer les dépendances, s'assurer que qu'on les prérequis node.js redis et mongodb, actvier le serveur redis et après lancer `npm start`
+Pour lancer l'application backend, suivre les étapes ci-dessous :
+
+**a. Installer les dépendances** :
+   - S'assurer d'être dans le répertoire du projet.
+   - Installer toutes les dépendances nécessaires en exécutant la commande suivante :
+     ```bash
+     npm install
+     ```
+
+**b. Vérifier les prérequis** :
+   - **Node.js** : S'assurer que Node.js est installé sur la machine. Vérifier la version de Node.js en exécutant la commande suivante :
+     ```bash
+     node -v
+     ```
+     Si Node.js n'est pas installé, le télécharger et l'installer à partir du site officiel : [Node.js](https://nodejs.org/).
+
+   - **MongoDB** : L'application nécessite une base de données MongoDB. S'assurer que MongoDB est installé et en cours d'exécution. 
+    
+     Si MongoDB n'est pas installé, suivre les instructions sur le site officiel : [Installation de MongoDB](https://www.mongodb.com/try/download/community).
+
+   - **Redis** : L'application utilise Redis pour la gestion du cache. S'assurer que Redis est installé et en cours d'exécution. Vérifier l'état de Redis en exécutant la commande suivante :
+     ```bash
+     redis-server --version
+     ```
+     Si Redis n'est pas installé, suivre les instructions sur le site officiel : [Installation de Redis](https://redis.io/download).
+
+**c. Démarrer le serveur Redis** :
+   - Avant de lancer l'application, s'assurer que le serveur Redis est bien activé. Pour démarrer Redis, exécuter la commande suivante :
+     ```bash
+     redis-server
+     ```
+     Cette commande démarre le serveur Redis sur le port par défaut (6379). Laisser ce terminal ouvert pendant toute la durée de l'exécution de l'application.
+
+**d. Lancer l'application** :
+   - Une fois que toutes les dépendances sont installées et que les services MongoDB et Redis sont en fonctionnement, l'application peut être démarrée en exécutant la commande suivante :
+     ```bash
+     npm start
+     ```
+   - Cette commande démarre le serveur de l'application backend et l'écoute sur le port spécifié dans le fichier de configuration (généralement `port 3000`). Un message indiquant que l'application est en cours d'exécution et prête à recevoir des requêtes doit s'afficher.
+
 
 ![Image1](Captures_d'écran/Connexion_établie.png)
 
+
+### 2. Tests avec Jest pour les opérations CRUD
+
+Pour garantir le bon fonctionnement des différentes opérations CRUD dans l'application, des tests unitaires ont été implémentés en utilisant **Jest**, un framework de test populaire pour les applications JavaScript. Ces tests permettent de vérifier que chaque fonctionnalité, comme la création, la lecture, la mise à jour et la suppression des données, fonctionne correctement et de manière fiable.
+
+#### a. Installation de Jest
+
+Pour commencer à utiliser Jest dans un projet, l'installer d'abord en tant que dépendance de développement. Si ce n'est pas déjà fait, installer Jest en exécutant la commande suivante dans le terminal à la racine du projet :
+
+```bash
+ npm install --save-dev jest
+```
+Ensuite, configurer un script dans le package.json pour exécuter les tests. Ajouter ou modifier la section scripts comme suit :
+
+```json
+"scripts": {
+  "test": "jest"
+},"jest": {
+    "testEnvironment": "node"
+  }
+```
+Cela permet de lancer les tests avec la commande suivante :
+
+```bash 
+npm test
+```
+#### b. Mise en place de la couche mock pour les tests
+Lorsqu'on effectue des tests unitaires, il est souvent nécessaire de simuler certaines dépendances externes, comme la base de données ou les appels réseau, afin d'éviter d'interagir avec les ressources réelles pendant les tests. C'est là que la couche mock (ici `_mock_`) entre en jeu.
+Dans Jest, la fonction `jest.mock()` peut être utilisée pour créer des mocks de modules ou de services. Cela permet de tester les fonctionnalités sans avoir besoin de se connecter réellement à la base de données. Vous pouvez également utiliser `jest.fn()` pour créer des fonctions simulées avec un comportement personnalisé pour les tests.
+
+#### c. Création des fichiers de tests
+Une fois les mocks définis, les tests peuvent être écrits en utilisant les assertions fournies par Jest. Les tests avec Jest doivent être définis dans des fichiers ayant l'extension `.test.js`. Ces fichiers sont généralement situés dans un répertoire tests (ici `_test_`) ou au même niveau que les fichiers du code source.
+
+#### d. Exécution des tests
+Une fois que les tests sont écrits, les exécuter avec la commande suivante :
+
+```bash 
+npm test
+```
+Cela lance Jest, qui trouve tous les fichiers `.test.js` dans le projet et exécute les tests qu'ils contiennent. Jest fournira un rapport détaillant les tests réussis et échoués, avec des informations sur les erreurs éventuelles, ce qui permet de facilement identifier et corriger les problèmes dans le code.
+
+### 3. Scénario de tests
+
+Dans ce projet, les tests ont été effectués d'abord avec l'élément `student` en utilisant le fichier `studentController.test.js` avec Jest. Comme le montre l'image ci-dessous, tous les éléments ont été testés avec succès et sont entièrement fonctionnels :
+
+![Image2](Captures_d'écran/Jest_students.png)
+
+Le fichier `courseController.test.js` a ensuite été créé et testé avec succès. Les résultats du test sont illustrés dans l'image ci-dessous :
+
+![Image3](Captures_d'écran/Jest_all.png)
+
+Grâce à Jest, il est possible de tester efficacement les opérations CRUD en isolant les différents composants de l'application grâce aux mocks et en s'assurant que chaque fonctionnalité fonctionne comme prévu. Les tests permettent non seulement de valider les opérations mais aussi de prévenir d'éventuelles régressions lors de l'ajout de nouvelles fonctionnalités ou de modifications du code.
 ---
 
 ## Conclusion
